@@ -11,14 +11,17 @@ var log = logging.MustGetLogger("gollery")
 
 var Config struct {
 	Global struct {
-		DefaultThumbSize int
+		DefaultThumbWidth int
+		DefaultThumbHeight int
 	}
 
 	Gallery map[string]*struct {
-		Root string
+		ImagePath string
+		ImageURL string
 		ThumbPath string
 		ThumbURL string
-		ThumbSize int
+		ThumbWidth int
+		ThumbHeight int
 	}
 }
 
@@ -42,8 +45,11 @@ func main() {
 
 	// Update defaults
 	for _, gallery := range Config.Gallery {
-		if gallery.ThumbSize == 0 {
-			gallery.ThumbSize = Config.Global.DefaultThumbSize
+		if gallery.ThumbHeight == 0 {
+			gallery.ThumbHeight = Config.Global.DefaultThumbHeight
+		}
+		if gallery.ThumbWidth == 0 {
+			gallery.ThumbWidth = Config.Global.DefaultThumbWidth
 		}
 	}
 }
