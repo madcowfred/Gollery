@@ -1,17 +1,28 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
 	"os"
 	"path"
 	"strings"
+	"time"
 )
 
 var tmpl = make(map[string]*template.Template)
 
+const (
+	TIME_FORMAT = "2006-01-02 15:04:05"
+)
+
 func init() {
-	tmpl["gallery"] = template.Must(template.ParseFiles("assets/templates/gallery.html", "assets/templates/base.html"))
+	tmpl["gallery"] = template.Must(template.New("gallery").
+		Funcs(template.FuncMap{
+		"formatSize": formatSize,
+		"formatTime": formatTime,
+	}).
+		ParseFiles("assets/templates/gallery.html", "assets/templates/base.html"))
 }
 
 type Page struct {
@@ -126,4 +137,18 @@ func localRedirect(w http.ResponseWriter, r *http.Request, newPath string) {
 	}
 	w.Header().Set("Location", newPath)
 	w.WriteHeader(http.StatusTemporaryRedirect)
+}
+
+// Simple pipeline func to format file size nicely
+func formatSize(size int64) string {
+	if size < (1024 * 1024) {
+		return fmt.Sprintf("%.1f KiB", float64(size)/1024)
+	} else {
+		return fmt.Sprintf("%.1f MiB", float64(size)/1024/1024)
+	}
+}
+
+// Simple pipeline func to format unix time nicely
+func formatTime(unix int64) string {
+	return time.Unix(unix, 0).Format(TIME_FORMAT)
 }

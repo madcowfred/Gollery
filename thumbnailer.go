@@ -25,6 +25,7 @@ var (
 type ImageInfo struct {
 	FileSize    int64  `json:"s"`
 	ModTime     int64  `json:"m"`
+	ImageTitle  string `json:"d"`
 	ImagePath   string `json:"i"`
 	ImageWidth  int    `json:"w"`
 	ImageHeight int    `json:"h"`
@@ -121,7 +122,8 @@ func (t *Thumbnailer) ScanFolder(gallery *GalleryConfig, basePath string) ([]str
 		}
 
 		// Don't care about weird filetypes
-		if !reImage.MatchString(fileName) {
+		fileMatches := reImage.FindAllStringSubmatch(fileName, -1)
+		if len(fileMatches) == 0 {
 			continue
 		}
 
@@ -171,6 +173,9 @@ func (t *Thumbnailer) ScanFolder(gallery *GalleryConfig, basePath string) ([]str
 			return nil, nil, err
 		}
 
+		// Build an image title
+		imageTitle := strings.Replace(fileMatches[0][1], "_", " ", -1)
+
 		// log.Debug("thumbnail for %s took %s", filePath, time.Since(t))
 
 		// Finish junk
@@ -179,6 +184,7 @@ func (t *Thumbnailer) ScanFolder(gallery *GalleryConfig, basePath string) ([]str
 		imageInfo = ImageInfo{
 			FileSize:    fileSize,
 			ModTime:     fileModTime,
+			ImageTitle:  imageTitle,
 			ImagePath:   imagePart,
 			ImageWidth:  int(imageWidth),
 			ImageHeight: int(imageHeight),
