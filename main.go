@@ -104,6 +104,14 @@ func main() {
 		gallery.InitThumbDirs()
 	}
 
+	// Start the cache expire timer
+	ticker := time.NewTicker(time.Second * 5)
+	go func() {
+		for _ = range ticker.C {
+			cache.Expire()
+		}
+	}()
+
 	// Set up HTTP handling
 	r := mux.NewRouter()
 
@@ -121,6 +129,7 @@ func main() {
 
 	http.Handle("/", r)
 
+	// Listen and serve
 	log.Info("Listening on %s", Config.Global.Listen)
 	if err = http.ListenAndServe(Config.Global.Listen, r); err != nil {
 		panic(err)

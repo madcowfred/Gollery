@@ -1,6 +1,7 @@
 package main
 
 import (
+	"sync"
 	"time"
 )
 
@@ -10,14 +11,22 @@ type GalleryData struct {
 	Images     []ImageInfo
 }
 type GalleryCache struct {
+	*sync.Mutex
 	Paths map[string]GalleryData
 }
 
 func NewGalleryCache() *GalleryCache {
-	return &GalleryCache{make(map[string]GalleryData)}
+	return &GalleryCache{
+		&sync.Mutex{},
+		make(map[string]GalleryData),
+	}
 }
 
 func (gc *GalleryCache) Get(basePath string) ([]string, []ImageInfo, bool) {
+	// Acquire lock
+	gc.Lock()
+	defer gc.Unlock()
+
 	// Check cache
 	gd, ok := gc.Paths[basePath]
 	if !ok {
@@ -34,9 +43,26 @@ func (gc *GalleryCache) Get(basePath string) ([]string, []ImageInfo, bool) {
 }
 
 func (gc *GalleryCache) Set(basePath string, dirs []string, images []ImageInfo) {
+	// Acquire lock
+	gc.Lock()
+	defer gc.Unlock()
+
 	gc.Paths[basePath] = GalleryData{
 		CacheUntil: time.Now().Add(time.Duration(Config.Global.CacheTime) * time.Second),
 		Dirs:       dirs,
 		Images:     images,
+	}
+}
+
+func (gc *GalleryCache) Expire() {
+	// Acquire lock
+	gc.Lock()
+	defer gc.Unlock()
+
+	now := time.Now()
+	for k, gd := range gc.Paths {
+		if gd.CacheUntil.Before(now) {
+			delete(gc.Paths, k)
+		}
 	}
 }
