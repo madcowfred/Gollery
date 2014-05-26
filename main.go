@@ -112,6 +112,9 @@ func main() {
 	r.PathPrefix("/.images/").Handler(http.StripPrefix("/.images", http.HandlerFunc(ImageHandler)))
 	// Serve thumbnail files
 	r.PathPrefix("/.thumbs/").Handler(http.StripPrefix("/.thumbs", http.HandlerFunc(ThumbHandler)))
+	// Serve special stupid files
+	r.HandleFunc("/favicon.ico", serveStatic)
+	r.HandleFunc("/robots.txt", serveStatic)
 	// Serve galleries
 	r.PathPrefix("/").Handler(LogHandler(os.Stdout, http.HandlerFunc(GalleryHandler)))
 
@@ -140,6 +143,10 @@ func noDirFileServer(h http.Handler) http.HandlerFunc {
 		}
 		h.ServeHTTP(w, r)
 	})
+}
+
+func serveStatic(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, path.Join("static", r.URL.Path))
 }
 
 func getGallery(r *http.Request) string {

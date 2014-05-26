@@ -15,9 +15,12 @@ import (
 	"time"
 )
 
-var reDimensions = regexp.MustCompile(" ([0-9]+)x([0-9]+)")
-var reImage = regexp.MustCompile("(?i)^(.+)\\.(gif|jpeg|jpg|png)$")
+var (
+	reDimensions = regexp.MustCompile(" ([0-9]+)x([0-9]+)")
+	reImage = regexp.MustCompile("(?i)^(.+)\\.(gif|jpeg|jpg|png)$")
+)
 
+// Image information, gasp
 type ImageInfo struct {
 	FileSize    int64  `json:"s"`
 	ModTime     int64  `json:"m"`
