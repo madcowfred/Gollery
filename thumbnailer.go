@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -122,9 +123,12 @@ func (t *Thumbnailer) ScanFolder(gallery *GalleryConfig, basePath string) ([]str
 
 		fileName := fileInfo.Name()
 
-		// Don't care about directories
+		// Directories don't need any further processing
 		if fileInfo.IsDir() {
-			dirs = append(dirs, fileName)
+			// Skip dotdirectories
+			if !strings.HasPrefix(fileName, ".") {
+				dirs = append(dirs, fileName)
+			}
 			continue
 		}
 
