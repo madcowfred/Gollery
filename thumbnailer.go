@@ -5,16 +5,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/garyburd/redigo/redis"
-	"github.com/quirkey/magick"
 	"io/ioutil"
 	"os/exec"
 	"path"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"sync"
 	"time"
 )
 
+var reDimensions = regexp.MustCompile(" ([0-9]+)x([0-9]+)=>[0-9]+x[0-9]+ ")
 var reImage = regexp.MustCompile("(?i)^(.+)\\.(gif|jpeg|jpg|png)$")
 
 type ImageInfo struct {
@@ -95,11 +96,18 @@ func (t *Thumbnailer) ScanFolder(gallery *GalleryConfig, basePath string) ([]str
 	// Iterateee
 	t3 := time.Now()
 	for _, fileInfo := range fileNames {
+		tl := time.Now()
+
 		fileName := fileInfo.Name()
 
 		// Don't care about directories
 		if fileInfo.IsDir() {
 			dirs = append(dirs, fileName)
+			continue
+		}
+
+		// Don't care about weird filetypes
+		if !reImage.MatchString(fileName) {
 			continue
 		}
 
@@ -125,23 +133,31 @@ func (t *Thumbnailer) ScanFolder(gallery *GalleryConfig, basePath string) ([]str
 		thumbPath := path.Join(gallery.ThumbPath, thumbPart)
 
 		// Generate the thumbnail image and save it
-		t := time.Now()
+		// t := time.Now()
 
-		cmd := exec.Command("convert", filePath, "-thumbnail", resizeStr, "-gravity", "center", "-extent", extentStr, thumbPath)
-		if err = cmd.Run(); err != nil {
-			return nil, nil, err
-		}
-
-		// Read image dimensions :(
-		img1, err := magick.NewFromFile(filePath)
-		defer img1.Destroy()
+		cmd := exec.Command("convert", filePath, "-thumbnail", resizeStr, "-gravity", "center", "-quality", "90", "-extent", extentStr, "-verbose", thumbPath)
+		out, err := cmd.CombinedOutput()
 		if err != nil {
 			return nil, nil, err
 		}
 
-		imageWidth, imageHeight := img1.Width(), img1.Height()
+		// Get image dimensions from the output
+		matches := reDimensions.FindAllStringSubmatch(string(out), -1)
+		if len(matches) == 0 {
+			log.Warning("matches failed: %q", out)
+			return nil, nil, err
+		}
 
-		log.Debug("thumbnail for %s took %s", filePath, time.Since(t))
+		imageWidth, err := strconv.ParseInt(matches[0][1], 10, 32)
+		if err != nil {
+			return nil, nil, err
+		}
+		imageHeight, err := strconv.ParseInt(matches[0][2], 10, 32)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		// log.Debug("thumbnail for %s took %s", filePath, time.Since(t))
 
 		// Finish junk
 		imagePart, _ := filepath.Rel(gallery.ImagePath, filePath)
@@ -150,12 +166,14 @@ func (t *Thumbnailer) ScanFolder(gallery *GalleryConfig, basePath string) ([]str
 			FileSize:    fileSize,
 			ModTime:     fileModTime,
 			ImagePath:   imagePart,
-			ImageWidth:  imageWidth,
-			ImageHeight: imageHeight,
+			ImageWidth:  int(imageWidth),
+			ImageHeight: int(imageHeight),
 			ThumbPath:   thumbPart,
 		}
 		images = append(images, imageInfo)
 		fileMap[fileName] = imageInfo
+
+		log.Debug("loop for %s took %s", filePath, time.Since(tl))
 	}
 	log.Debug("Loop took %s", time.Since(t3))
 

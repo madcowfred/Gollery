@@ -3,10 +3,13 @@ package main
 import (
 	"code.google.com/p/gcfg"
 	"github.com/garyburd/redigo/redis"
+	"github.com/gorilla/mux"
 	"github.com/op/go-logging"
+	"net/http"
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -41,15 +44,15 @@ var redisPool = &redis.Pool{
 // Config stuff
 type GalleryConfig struct {
 	Name        string
+	BaseURL     string
 	ImagePath   string
-	ImageURL    string
 	ThumbPath   string
-	ThumbURL    string
 	ThumbWidth  int
 	ThumbHeight int
 }
 var Config struct {
 	Global struct {
+		Listen             string
 		CacheTime          int
 		DefaultThumbWidth  int
 		DefaultThumbHeight int
@@ -85,7 +88,10 @@ func main() {
 	for name, gallery := range Config.Gallery {
 		gallery.Name = name
 
-		// Update thumb defaults
+		// Update defaults
+		if gallery.BaseURL == "" {
+			gallery.BaseURL = "/"
+		}
 		if gallery.ThumbHeight == 0 {
 			gallery.ThumbHeight = Config.Global.DefaultThumbHeight
 		}
@@ -93,25 +99,51 @@ func main() {
 			gallery.ThumbWidth = Config.Global.DefaultThumbWidth
 		}
 
-		initThumbDirs(gallery)
+		gallery.InitThumbDirs()
 
-		dirs, images, err := tn.ScanFolder(gallery, path.Join(gallery.ImagePath, "pets"))
-		if err != nil {
-			log.Fatal(err)
-		}
+		// dirs, images, err := tn.ScanFolder(gallery, path.Join(gallery.ImagePath, "random"))
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
+	}
 
-		log.Debug("dirs: %v", dirs)
-		log.Debug("images: %v", images)
+	// Set up HTTP handling
+	r := mux.NewRouter()
+
+	// Serve static files
+	r.PathPrefix("/.static/").Handler(http.StripPrefix("/.static", noDirFileServer(http.FileServer(http.Dir("static/")))))
+	// Serve image files
+	r.PathPrefix("/.images/").HandlerFunc(ImageHandler)
+	// Serve thumbnail files
+	r.PathPrefix("/.thumbs/").HandlerFunc(ThumbHandler)
+	// Serve gallery stuff
+	r.PathPrefix("/").HandlerFunc(GalleryHandler)
+
+	http.Handle("/", r)
+
+	log.Info("Listening on %s", Config.Global.Listen)
+	if err = http.ListenAndServe(Config.Global.Listen, r); err != nil {
+		panic(err)
 	}
 
 	// tn.ScanFolder(Config.Gallery[0])
 }
 
-func initThumbDirs(gallery *GalleryConfig) {
+func (g *GalleryConfig) InitThumbDirs() {
 	for _, d := range PREFIXES {
-		dirPath := path.Join(gallery.ThumbPath, string(d))
+		dirPath := path.Join(g.ThumbPath, string(d))
 		if err := os.Mkdir(dirPath, 0755); err != nil {
 			log.Warning("Mkdir error: %s", err)
 		}
 	}
+}
+
+func noDirFileServer(h http.Handler) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasSuffix(r.URL.Path, "/") {
+			http.NotFound(w, r)
+			return
+		}
+		h.ServeHTTP(w, r)
+	})
 }
