@@ -16,6 +16,7 @@ func init() {
 type Page struct {
 	BaseURL string
 	JSON    string
+	Name    string
 	Path    string
 	Dirs    []string
 	Images  []ImageInfo
@@ -93,6 +94,7 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 	// Render the page
 	p := &Page{
 		BaseURL: gallery.BaseURL,
+		Name:    gallery.Name,
 		Path:    r.URL.Path,
 		Dirs:    dirs,
 		Images:  images,

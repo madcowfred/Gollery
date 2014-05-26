@@ -87,11 +87,12 @@ func main() {
 
 	// Update defaults
 	for name, gallery := range Config.Gallery {
-		gallery.Name = name
-
 		// Update defaults
 		if gallery.BaseURL == "" {
 			gallery.BaseURL = "/"
+		}
+		if gallery.Name == "" {
+			gallery.Name = name
 		}
 		if gallery.ThumbHeight == 0 {
 			gallery.ThumbHeight = Config.Global.DefaultThumbHeight
