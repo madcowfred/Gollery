@@ -8,8 +8,12 @@
 <div class="clearfix"></div></div>
 {{end}}
 {{if .Images}}
-<div class="images border-top-next">
-{{range $image := .Images}}<img class="image" src="{{$.BaseURL}}.thumbs/{{$image.ThumbPath}}" width="200" height="200" data-orig="{{$.BaseURL}}.images/{{$image.ImagePath}}">{{end}}
-<div class="clearfix"></div></div>
+<div class="images border-top-next"><ul id="og-grid" class="og-grid">
+{{range $image := .Images}}<li>
+<a href="{{$.BaseURL}}.images/{{$image.ImagePath}}" data-largesrc="{{$.BaseURL}}.images/{{$image.ImagePath}}" data-title="{{$image.ImageTitle}}" data-description="{{$image.ImageWidth}} x {{$image.ImageHeight}}<br>{{$image.FileSize | formatSize}}<br>{{$image.ModTime | formatTime}}">
+<img src="{{$.BaseURL}}.thumbs/{{$image.ThumbPath}}" width="200" height="200">
+</a>
+</li>{{end}}
+</ul><div class="clearfix"></div></div>
 {{end}}
 {{end}}

@@ -1,16 +1,18 @@
-all: css js
-css: static/gollery.css
-js: static/gollery.js
+JS = assets/js/modernizr.custom.js assets/js/grid.js assets/js/gollery.js
 
-static/gollery.css: assets/less/ assets/less/bootstrap/ assets/less/gollery/
+all: css js
+css: static/gollery.min.css
+js: static/gollery.min.js
+
+static/gollery.min.css: assets/less/ assets/less/bootstrap/ assets/less/gollery/
 	@echo -n Compiling and minifying CSS...
 	@lessc assets/less/bootstrap.less | cssmin > $@
 	@echo \ done!
 
-static/gollery.js: assets/js/
+static/gollery.min.js: assets/js/
 	@echo -n Compiling and minifying JS...
-	@uglifyjs assets/js/* -m -c -o $@
+	@uglifyjs ${JS} -m -c -o $@
 	@echo \ done!
 
 clean:
-	rm -f static/gollery.css static/gollery.js
+	rm -f static/gollery.min.css static/gollery.min.js
