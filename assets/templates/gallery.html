@@ -9,7 +9,7 @@
 {{end}}
 {{if .Images}}
 <div class="images border-top-next">
-{{range $image := .Images}}<div class="image"><a href="{{$.BaseURL}}.images/{{$image.ImagePath}}"><img src="{{$.BaseURL}}.thumbs/{{$image.ThumbPath}}" width="200" height="200"></a></div>{{end}}
+{{range $image := .Images}}<img class="image" src="{{$.BaseURL}}.thumbs/{{$image.ThumbPath}}" width="200" height="200" data-orig="{{$.BaseURL}}.images/{{$image.ImagePath}}">{{end}}
 <div class="clearfix"></div></div>
 {{end}}
 {{end}}
