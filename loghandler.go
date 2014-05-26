@@ -53,7 +53,6 @@ func LogHandler(out io.Writer, h http.Handler) http.Handler {
 	return logHandler{out, h}
 }
 
-
 // responseLogger is wrapper of http.ResponseWriter that keeps track of its HTTP status
 // code and body size
 type responseLogger struct {

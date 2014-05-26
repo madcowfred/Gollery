@@ -116,8 +116,8 @@ func main() {
 	// Serve image files
 	r.PathPrefix("/.images/").Handler(http.StripPrefix("/.images", http.HandlerFunc(ImageHandler)))
 	// Serve thumbnail files
-	r.PathPrefix("/.thumbs/").HandlerFunc(ThumbHandler)
-	// Serve gallery stuff
+	r.PathPrefix("/.thumbs/").Handler(http.StripPrefix("/.thumbs", http.HandlerFunc(ThumbHandler)))
+	// Serve galleries
 	r.PathPrefix("/").Handler(LogHandler(os.Stdout, http.HandlerFunc(GalleryHandler)))
 
 	http.Handle("/", r)
