@@ -131,7 +131,9 @@ func (g *GalleryConfig) InitThumbDirs() {
 	for _, d := range PREFIXES {
 		dirPath := path.Join(g.ThumbPath, string(d))
 		if err := os.Mkdir(dirPath, 0755); err != nil {
-			log.Warning("Mkdir error: %s", err)
+			if !os.IsExist(err) {
+				log.Warning("Mkdir error: %s", err)
+			}
 		}
 	}
 }
