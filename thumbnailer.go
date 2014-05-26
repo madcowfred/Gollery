@@ -95,22 +95,10 @@ func (t *Thumbnailer) ScanFolder(gallery *GalleryConfig, basePath string) ([]str
 	}
 
 	// Try fetching data from Redis
-	// t1 := time.Now()
-	jsonData, err := redis.String(conn.Do("HGET", "images", basePath))
-	if err != redis.ErrNil && err != nil {
+	fileMap, err := getFileMap(conn, basePath)
+	if err != nil {
 		return nil, nil, err
 	}
-	// log.Debug("HGET took %s", time.Since(t1))
-
-	// Try unmarshalling
-	// t2 := time.Now()
-	fileMap := make(map[string]ImageInfo)
-	if jsonData != "" {
-		if err = json.Unmarshal([]byte(jsonData), &fileMap); err != nil {
-			return nil, nil, err
-		}
-	}
-	// log.Debug("Unmarshal took %s", time.Since(t2))
 
 	// Some things
 	resizeStr := fmt.Sprintf("%dx%d^", gallery.ThumbWidth, gallery.ThumbHeight)
@@ -214,4 +202,24 @@ func (t *Thumbnailer) ScanFolder(gallery *GalleryConfig, basePath string) ([]str
 	conn.Do("HSET", "images", basePath, string(b))
 
 	return dirs, images, nil
+}
+
+func getFileMap(conn redis.Conn, basePath string) (map[string]ImageInfo, error) {
+	fileMap := make(map[string]ImageInfo)
+
+	jsonData, err := redis.String(conn.Do("HGET", "images", basePath))
+	if err == redis.ErrNil {
+		return fileMap, nil
+	} else if err != nil {
+		return nil, err
+	}
+
+	// Try unmarshalling
+	if jsonData != "" {
+		if err = json.Unmarshal([]byte(jsonData), &fileMap); err != nil {
+			return nil, err
+		}
+	}
+
+	return fileMap, err
 }
