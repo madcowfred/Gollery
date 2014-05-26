@@ -17,7 +17,7 @@ import (
 
 var (
 	reDimensions = regexp.MustCompile(" ([0-9]+)x([0-9]+)")
-	reImage = regexp.MustCompile("(?i)^(.+)\\.(gif|jpeg|jpg|png)$")
+	reImage      = regexp.MustCompile("(?i)^(.+)\\.(gif|jpeg|jpg|png)$")
 )
 
 // Image information, gasp
