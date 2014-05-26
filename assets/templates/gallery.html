@@ -2,30 +2,14 @@
         <title>{{.Path}} - Gollery</title>
 {{end}}
 {{define "body"}}
-    {{if .Dirs}}
-        <div class="dirs border-top-next">
-            {{range $dir := .Dirs}}
-                <div class="dir">
-                    <a href="{{$dir}}/">
-                        <img src="{{$.BaseURL}}.static/folder.png">
-                        {{$dir}}
-                    </a>
-                </div>
-            {{end}}
-            <div class="clearfix"></div>
-        </div>
-    {{end}}
-
-    {{if .Images}}
-        <div class="images border-top-next">
-            {{range $image := .Images}}
-                <div class="image">
-                    <a href="{{$.BaseURL}}.images/{{$image.ImagePath}}">
-                        <img src="{{$.BaseURL}}.thumbs/{{$image.ThumbPath}}">
-                    </a>
-                </div>
-            {{end}}
-            <div class="clearfix"></div>
-        </div>
-    {{end}}
+{{if .Dirs}}
+<div class="dirs border-top-next">
+{{range $dir := .Dirs}}<div class="dir"><a href="{{$dir}}/"><img src="{{$.BaseURL}}.static/folder.png">{{$dir}}</a></div>{{end}}
+<div class="clearfix"></div></div>
+{{end}}
+{{if .Images}}
+<div class="images border-top-next">
+{{range $image := .Images}}<div class="image"><a href="{{$.BaseURL}}.images/{{$image.ImagePath}}"><img src="{{$.BaseURL}}.thumbs/{{$image.ThumbPath}}"></a></div>{{end}}
+<div class="clearfix"></div></div>
+{{end}}
 {{end}}
