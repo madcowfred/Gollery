@@ -21,7 +21,7 @@
         position: relative;
     }
 
-/*    li.og-expanded > a::after {
+    /* li.og-expanded > a::after {
         top: auto;
         border: solid transparent;
         content: " ";
@@ -29,7 +29,7 @@
         width: 0;
         position: absolute;
         pointer-events: none;
-        border-bottom-color: #ddd;
+        border-bottom-color: #777;
         border-width: 15px;
         left: 50%;
         margin: -20px 0 0 -15px;
@@ -42,7 +42,7 @@
     top: auto;
     left: 0;
     width: 100%;
-    //margin-top: 10px;
+    margin-top: 5px;
     text-align: left;
     height: 0;
     overflow: hidden;
@@ -169,25 +169,28 @@
     animation: loader 0.5s infinite ease-in-out both;
 }
 
+@anim-1: #aaa;
+@anim-2: #777;
+
 @-webkit-keyframes loader {
-    0% { background: #ddd; }
-    33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }
-    66% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ddd, -15px 30px 1px #ccc; }
+    0% { background: @anim-1; }
+    33% { background: @anim-2; box-shadow: 0 0 1px @anim-2, 15px 30px 1px @anim-2, -15px 30px 1px @anim-1; }
+    66% { background: @anim-2; box-shadow: 0 0 1px @anim-2, 15px 30px 1px @anim-1, -15px 30px 1px @anim-2; }
 }
 
 @-moz-keyframes loader {
-    0% { background: #ddd; }
-    33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }
-    66% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ddd, -15px 30px 1px #ccc; }
+    0% { background: @anim-1; }
+    33% { background: @anim-2; box-shadow: 0 0 1px @anim-2, 15px 30px 1px @anim-2, -15px 30px 1px @anim-1; }
+    66% { background: @anim-2; box-shadow: 0 0 1px @anim-2, 15px 30px 1px @anim-1, -15px 30px 1px @anim-2; }
 }
 
 @keyframes loader {
-    0% { background: #ddd; }
-    33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }
-    66% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ddd, -15px 30px 1px #ccc; }
+    0% { background: @anim-1; }
+    33% { background: @anim-2; box-shadow: 0 0 1px @anim-2, 15px 30px 1px @anim-2, -15px 30px 1px @anim-1; }
+    66% { background: @anim-2; box-shadow: 0 0 1px @anim-2, 15px 30px 1px @anim-1, -15px 30px 1px @anim-2; }
 }
 
-@media screen and (max-width: 830px) {
+/*@media screen and (max-width: 830px) {
     .og-expander h3 { font-size: 32px; }
     .og-expander p { font-size: 13px; }
     .og-expander a { font-size: 12px; }
@@ -196,4 +199,4 @@
 @media screen and (max-width: 650px) {
     .og-fullimg { display: none; }
     .og-details { float: none; width: 100%; }
-}
+}*/
