@@ -19,8 +19,8 @@ const (
 
 var (
 	cache = NewGalleryCache()
-	log = logging.MustGetLogger("gollery")
-	tn = NewThumbnailer()
+	log   = logging.MustGetLogger("gollery")
+	tn    = NewThumbnailer()
 )
 
 // Redis connection pool
@@ -50,6 +50,7 @@ type GalleryConfig struct {
 	ThumbWidth  int
 	ThumbHeight int
 }
+
 var Config struct {
 	Global struct {
 		Listen             string
@@ -60,7 +61,7 @@ var Config struct {
 
 	Redis struct {
 		ConnectionString string
-		Database int
+		Database         int
 	}
 
 	Gallery map[string]*GalleryConfig
@@ -113,11 +114,11 @@ func main() {
 	// Serve static files
 	r.PathPrefix("/.static/").Handler(http.StripPrefix("/.static", noDirFileServer(http.FileServer(http.Dir("static/")))))
 	// Serve image files
-	r.PathPrefix("/.images/").HandlerFunc(ImageHandler)
+	r.PathPrefix("/.images/").Handler(http.StripPrefix("/.images", http.HandlerFunc(ImageHandler)))
 	// Serve thumbnail files
 	r.PathPrefix("/.thumbs/").HandlerFunc(ThumbHandler)
 	// Serve gallery stuff
-	r.PathPrefix("/").HandlerFunc(GalleryHandler)
+	r.PathPrefix("/").Handler(LogHandler(os.Stdout, http.HandlerFunc(GalleryHandler)))
 
 	http.Handle("/", r)
 
@@ -125,8 +126,6 @@ func main() {
 	if err = http.ListenAndServe(Config.Global.Listen, r); err != nil {
 		panic(err)
 	}
-
-	// tn.ScanFolder(Config.Gallery[0])
 }
 
 func (g *GalleryConfig) InitThumbDirs() {
@@ -146,4 +145,17 @@ func noDirFileServer(h http.Handler) http.HandlerFunc {
 		}
 		h.ServeHTTP(w, r)
 	})
+}
+
+func getGallery(r *http.Request) string {
+	var gallery string
+
+	head, ok := r.Header["X-Gollery"]
+	if ok {
+		if _, ok := Config.Gallery[head[0]]; ok {
+			gallery = head[0]
+		}
+	}
+
+	return gallery
 }
