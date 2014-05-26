@@ -17,7 +17,7 @@ func init() {
 type Page struct {
 	BaseURL string
 	JSON    string
-	Name	string
+	Name    string
 	Path    string
 	Dirs    []string
 	Images  []ImageInfo
