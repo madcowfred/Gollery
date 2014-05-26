@@ -77,7 +77,7 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Check for trailing /
 	if !strings.HasSuffix(r.URL.Path, "/") {
-		newPath := path.Clean(gallery.BaseURL + r.URL.Path) + "/"
+		newPath := path.Clean(gallery.BaseURL+r.URL.Path) + "/"
 		log.Debug("%s -> %s", r.URL.Path, newPath)
 		localRedirect(w, r, newPath)
 		return
@@ -103,9 +103,9 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 // Render a template
 func renderTemplate(w http.ResponseWriter, t string, p *Page) {
 	err := tmpl[t].ExecuteTemplate(w, "base", p)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-    }
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 // (from net/http/fs.go)
@@ -114,7 +114,7 @@ func renderTemplate(w http.ResponseWriter, t string, p *Page) {
 // It does not convert relative paths to absolute paths like Redirect does.
 func localRedirect(w http.ResponseWriter, r *http.Request, newPath string) {
 	if q := r.URL.RawQuery; q != "" {
-   		newPath += "?" + q
+		newPath += "?" + q
 	}
 	w.Header().Set("Location", newPath)
 	w.WriteHeader(http.StatusTemporaryRedirect)
