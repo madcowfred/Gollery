@@ -173,7 +173,7 @@ var Grid = (function() {
 		// used to know if the preview will expand in a different row
 		previewPos = -1,
 		// extra amount of pixels to scroll the window
-		scrollExtra = 0,
+		scrollExtra = -10,
 		// extra margin when expanded (between preview overlay and the next items)
 		marginExpanded = 10,
 		$window = $( window ), winsize,
@@ -192,7 +192,7 @@ var Grid = (function() {
 		// default settings
 		settings = {
 			minHeight : 500,
-			speed : 350,
+			speed : 100,
 			easing : 'ease'
 		};
 
@@ -494,6 +494,8 @@ var Grid = (function() {
 			var position = this.$item.data( 'offsetTop' ),
 				previewOffsetT = this.$previewEl.offset().top - scrollExtra,
 				scrollVal = this.height + this.$item.data( 'height' ) + marginExpanded <= winsize.height ? position : this.height < winsize.height ? previewOffsetT - ( winsize.height - this.height ) : previewOffsetT;
+
+			scrollVal -= 6;
 
 			$body.animate( { scrollTop : scrollVal }, settings.speed );
 
