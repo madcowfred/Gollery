@@ -1,0 +1,199 @@
+.og-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto;
+    //text-align: center;
+    width: 100%;
+
+    li {
+        display: inline-block;
+        margin: 6px 3px 0 3px;
+        vertical-align: top;
+        height: 200px;
+        border: 1px solid #555;
+    }
+
+    li > a,
+    li > a img {
+        border: none;
+        outline: none;
+        display: block;
+        position: relative;
+    }
+
+/*    li.og-expanded > a::after {
+        top: auto;
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+        border-bottom-color: #ddd;
+        border-width: 15px;
+        left: 50%;
+        margin: -20px 0 0 -15px;
+    }*/
+}
+
+.og-expander {
+    position: absolute;
+    background: #111;
+    top: auto;
+    left: 0;
+    width: 100%;
+    //margin-top: 10px;
+    text-align: left;
+    height: 0;
+    overflow: hidden;
+    border-top: 2px solid #555;
+    border-bottom: 2px solid #555;
+}
+
+.og-expander-inner {
+    padding: 30px;
+    height: 100%;
+}
+
+.og-close {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+    z-index: 1000;
+}
+
+.og-close::before,
+.og-close::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    top: 50%;
+    height: 1px;
+    background: #888;
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+
+.og-close::after {
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+
+.og-close:hover::before,
+.og-close:hover::after {
+    background: #333;
+}
+
+.og-fullimg,
+.og-details {
+    float: left;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.og-fullimg {
+    width: 60%;
+
+    text-align: center;
+
+    img {
+        display: inline-block;
+        max-height: 100%;
+        max-width: 100%;
+    }
+}
+
+.og-details {
+    width: 40%;
+    padding: 0 20px 0 20px;
+
+    h3 {
+        font-weight: 300;
+        font-size: 36px;
+        padding: 0;
+        margin: 0 0 10px;
+    }
+
+    p {
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 22px;
+        color: #999;
+        margin: 0;
+    }
+
+    a {
+        font-weight: 700;
+        font-size: 16px;
+        color: darken(@link-color, 20%);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        padding: 10px;
+        border: 3px solid #777;
+        display: inline-block;
+        margin: 30px 0 0;
+        outline: none;
+    }
+
+    a::before {
+        content: '\2192';
+        display: inline-block;
+        margin-right: 10px;
+    }
+
+    a:hover {
+        border-color: #999;
+        color: @link-color;
+        text-decoration: none;
+    }
+}
+
+.og-loading {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #ddd;
+    box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ccc;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: -25px 0 0 -25px;
+    -webkit-animation: loader 0.5s infinite ease-in-out both;
+    -moz-animation: loader 0.5s infinite ease-in-out both;
+    animation: loader 0.5s infinite ease-in-out both;
+}
+
+@-webkit-keyframes loader {
+    0% { background: #ddd; }
+    33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }
+    66% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ddd, -15px 30px 1px #ccc; }
+}
+
+@-moz-keyframes loader {
+    0% { background: #ddd; }
+    33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }
+    66% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ddd, -15px 30px 1px #ccc; }
+}
+
+@keyframes loader {
+    0% { background: #ddd; }
+    33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }
+    66% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ddd, -15px 30px 1px #ccc; }
+}
+
+@media screen and (max-width: 830px) {
+    .og-expander h3 { font-size: 32px; }
+    .og-expander p { font-size: 13px; }
+    .og-expander a { font-size: 12px; }
+}
+
+@media screen and (max-width: 650px) {
+    .og-fullimg { display: none; }
+    .og-details { float: none; width: 100%; }
+}
