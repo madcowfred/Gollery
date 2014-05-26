@@ -32,10 +32,29 @@ type ImageInfo struct {
 
 type Thumbnailer struct {
 	*sync.Mutex
+	Paths map[string]*sync.Mutex
 }
 
 func NewThumbnailer() *Thumbnailer {
-	return &Thumbnailer{&sync.Mutex{}}
+	return &Thumbnailer{
+		&sync.Mutex{},
+		make(map[string]*sync.Mutex),
+	}
+}
+
+// Get or create a mutex for a path
+func (t *Thumbnailer) GetMutex(basePath string) *sync.Mutex {
+	t.Lock()
+	defer t.Unlock()
+
+	m, ok := t.Paths[basePath]
+	if !ok {
+		m := &sync.Mutex{}
+		t.Paths[basePath] = m
+		return m
+	} else {
+		return m
+	}
 }
 
 func (t *Thumbnailer) ScanFolder(gallery *GalleryConfig, basePath string) ([]string, []ImageInfo, error) {
@@ -45,8 +64,9 @@ func (t *Thumbnailer) ScanFolder(gallery *GalleryConfig, basePath string) ([]str
 	// }()
 
 	// Acquire lock
-	t.Lock()
-	defer t.Unlock()
+	m := t.GetMutex(basePath)
+	m.Lock()
+	defer m.Unlock()
 
 	// Check cache
 	cacheDirs, cacheImages, cacheOk := cache.Get(basePath)
