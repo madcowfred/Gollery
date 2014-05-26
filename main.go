@@ -101,11 +101,6 @@ func main() {
 		}
 
 		gallery.InitThumbDirs()
-
-		// dirs, images, err := tn.ScanFolder(gallery, path.Join(gallery.ImagePath, "random"))
-		// if err != nil {
-		// 	log.Fatal(err)
-		// }
 	}
 
 	// Set up HTTP handling

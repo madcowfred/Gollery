@@ -19,12 +19,12 @@ var reDimensions = regexp.MustCompile(" ([0-9]+)x([0-9]+)=>[0-9]+x[0-9]+ ")
 var reImage = regexp.MustCompile("(?i)^(.+)\\.(gif|jpeg|jpg|png)$")
 
 type ImageInfo struct {
-	FileSize    int64
-	ModTime     int64
-	ImagePath   string
-	ImageWidth  int
-	ImageHeight int
-	ThumbPath   string
+	FileSize    int64  `json:"s"`
+	ModTime     int64  `json:"m"`
+	ImagePath   string `json:"i"`
+	ImageWidth  int    `json:"w"`
+	ImageHeight int    `json:"h"`
+	ThumbPath   string `json:"t"`
 }
 
 type Thumbnailer struct {
@@ -112,7 +112,7 @@ func (t *Thumbnailer) ScanFolder(gallery *GalleryConfig, basePath string) ([]str
 		}
 
 		// Check to see if the image has changed
-		fileModTime := fileInfo.ModTime().UnixNano()
+		fileModTime := fileInfo.ModTime().Unix()
 		fileSize := fileInfo.Size()
 
 		imageInfo, ok := fileMap[fileName]
