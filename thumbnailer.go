@@ -36,10 +36,10 @@ func NewThumbnailer() *Thumbnailer {
 }
 
 func (t *Thumbnailer) ScanFolder(gallery *GalleryConfig, basePath string) ([]string, []ImageInfo, error) {
-	start := time.Now()
-	defer func() {
-		log.Info("ScanFolder(%s) took %s", basePath, time.Since(start))
-	}()
+	// start := time.Now()
+	// defer func() {
+	// 	log.Info("ScanFolder(%s) took %s", basePath, time.Since(start))
+	// }()
 
 	// Acquire lock
 	t.Lock()
@@ -48,7 +48,6 @@ func (t *Thumbnailer) ScanFolder(gallery *GalleryConfig, basePath string) ([]str
 	// Check cache
 	cacheDirs, cacheImages, cacheOk := cache.Get(basePath)
 	if cacheOk {
-		log.Debug("cached")
 		return cacheDirs, cacheImages, nil
 	}
 
@@ -72,29 +71,29 @@ func (t *Thumbnailer) ScanFolder(gallery *GalleryConfig, basePath string) ([]str
 	}
 
 	// Try fetching data from Redis
-	t1 := time.Now()
+	// t1 := time.Now()
 	jsonData, err := redis.String(conn.Do("HGET", "images", basePath))
 	if err != redis.ErrNil && err != nil {
 		return nil, nil, err
 	}
-	log.Debug("HGET took %s", time.Since(t1))
+	// log.Debug("HGET took %s", time.Since(t1))
 
 	// Try unmarshalling
-	t2 := time.Now()
+	// t2 := time.Now()
 	fileMap := make(map[string]ImageInfo)
 	if jsonData != "" {
 		if err = json.Unmarshal([]byte(jsonData), &fileMap); err != nil {
 			return nil, nil, err
 		}
 	}
-	log.Debug("Unmarshal took %s", time.Since(t2))
+	// log.Debug("Unmarshal took %s", time.Since(t2))
 
 	// Some things
 	resizeStr := fmt.Sprintf("%dx%d^", gallery.ThumbWidth, gallery.ThumbHeight)
 	extentStr := fmt.Sprintf("%dx%d", gallery.ThumbWidth, gallery.ThumbHeight)
 
 	// Iterateee
-	t3 := time.Now()
+	// t3 := time.Now()
 	for _, fileInfo := range fileNames {
 		tl := time.Now()
 
@@ -175,7 +174,7 @@ func (t *Thumbnailer) ScanFolder(gallery *GalleryConfig, basePath string) ([]str
 
 		log.Debug("loop for %s took %s", filePath, time.Since(tl))
 	}
-	log.Debug("Loop took %s", time.Since(t3))
+	// log.Debug("Loop took %s", time.Since(t3))
 
 	// Update cache
 	cache.Set(basePath, dirs, images)
