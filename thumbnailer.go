@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-var reDimensions = regexp.MustCompile(" ([0-9]+)x([0-9]+)=>[0-9]+x[0-9]+ ")
+var reDimensions = regexp.MustCompile(" ([0-9]+)x([0-9]+)")
 var reImage = regexp.MustCompile("(?i)^(.+)\\.(gif|jpeg|jpg|png)$")
 
 type ImageInfo struct {
@@ -135,7 +135,7 @@ func (t *Thumbnailer) ScanFolder(gallery *GalleryConfig, basePath string) ([]str
 		// Generate the thumbnail image and save it
 		// t := time.Now()
 
-		cmd := exec.Command("convert", filePath, "-thumbnail", resizeStr, "-gravity", "center", "-quality", "90", "-extent", extentStr, "-verbose", thumbPath)
+		cmd := exec.Command("convert", fmt.Sprintf("%s[0]", filePath), "-thumbnail", resizeStr, "-gravity", "center", "-quality", "90", "-extent", extentStr, "-verbose", thumbPath)
 		out, err := cmd.CombinedOutput()
 		if err != nil {
 			return nil, nil, err

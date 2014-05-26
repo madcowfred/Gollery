@@ -14,8 +14,6 @@ type logHandler struct {
 
 // This is basically a copy/paste of the gorilla/handlers code with a different log format
 func (h logHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	log.Info("loghandler")
-
 	t := time.Now()
 	logger := &responseLogger{w: w}
 	h.handler.ServeHTTP(logger, req)

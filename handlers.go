@@ -1,17 +1,24 @@
 package main
 
 import (
-	"encoding/json"
+	"html/template"
 	"net/http"
 	"path"
 	"strings"
 )
 
-// Simple struct for page data
-type PageData struct {
+var tmpl = make(map[string]*template.Template)
+
+func init() {
+	tmpl["gallery"] = template.Must(template.ParseFiles("assets/templates/gallery.html", "assets/templates/base.html"))
+}
+
+type Page struct {
 	BaseURL string
-	Dirs    []string    `json:"dirs"`
-	Images  []ImageInfo `json:"images"`
+	JSON    string
+	Path    string
+	Dirs    []string
+	Images  []ImageInfo
 }
 
 func galleryStaticHandler(w http.ResponseWriter, r *http.Request, basePath string) {
@@ -53,8 +60,6 @@ func ThumbHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GalleryHandler(w http.ResponseWriter, r *http.Request) {
-	log.Debug("GalleryHandler: %s", r.URL.Path)
-
 	// Check the gallery header
 	g := getGallery(r)
 	if g == "" {
@@ -73,16 +78,24 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 	// Scan the directory
 	dirs, images, err := tn.ScanFolder(gallery, cleanPath)
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	pd := PageData{gallery.BaseURL, dirs, images}
-	jsonData, err := json.Marshal(pd)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
+	// Render the page
+	p := &Page{
+		BaseURL: gallery.BaseURL,
+		Path:    r.URL.Path,
+		Dirs:    dirs,
+		Images:  images,
 	}
+	renderTemplate(w, "gallery", p)
+}
 
-	log.Debug("%s", jsonData)
+// Render a template
+func renderTemplate(w http.ResponseWriter, t string, p *Page) {
+	err := tmpl[t].ExecuteTemplate(w, "base", p)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+    }
 }

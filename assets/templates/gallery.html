@@ -1,0 +1,27 @@
+{{define "head"}}
+        <title>{{.Path}} - Gollery</title>
+{{end}}
+{{define "body"}}
+    {{if .Dirs}}
+        <div class="dirs border-top-next">
+            {{range $dir := .Dirs}}
+                <div class="dir">
+                    <img src="{{$.BaseURL}}.static/folder.png" width="100" height="100">
+                    <a href="{{$dir}}">{{$dir}}</a>
+                </div>
+            {{end}}
+        </div>
+    {{end}}
+
+    {{if .Images}}
+        <div class="images border-top-next">
+            {{range $image := .Images}}
+                <div class="image">
+                    <a href="{{$.BaseURL}}.images/{{$image.ImagePath}}">
+                        <img src="{{$.BaseURL}}.thumbs/{{$image.ThumbPath}}">
+                    </a>
+                </div>
+            {{end}}
+        </div>
+    {{end}}
+{{end}}
