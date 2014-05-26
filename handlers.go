@@ -3,6 +3,7 @@ package main
 import (
 	"html/template"
 	"net/http"
+	"os"
 	"path"
 	"strings"
 )
@@ -16,7 +17,7 @@ func init() {
 type Page struct {
 	BaseURL string
 	JSON    string
-	Name    string
+	Name	string
 	Path    string
 	Dirs    []string
 	Images  []ImageInfo
@@ -47,7 +48,7 @@ func ImageHandler(w http.ResponseWriter, r *http.Request) {
 	galleryStaticHandler(w, r, gallery.ImagePath)
 }
 
-// Service static thumbnails for galleries
+// Serve static thumbnails for galleries
 func ThumbHandler(w http.ResponseWriter, r *http.Request) {
 	// Check the gallery header
 	g := getGallery(r)
@@ -60,6 +61,7 @@ func ThumbHandler(w http.ResponseWriter, r *http.Request) {
 	galleryStaticHandler(w, r, gallery.ThumbPath)
 }
 
+// Serve a gallery page
 func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 	// Check the gallery header
 	g := getGallery(r)
@@ -86,8 +88,12 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Scan the directory
 	dirs, images, err := tn.ScanFolder(gallery, cleanPath)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if os.IsNotExist(err) {
+		http.NotFound(w, r)
+		return
+	} else if err != nil {
+		log.Error("GalleryHandler:", err.Error())
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
