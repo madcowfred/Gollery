@@ -2,6 +2,7 @@ package main
 
 import (
 	"code.google.com/p/gcfg"
+	"fmt"
 	"github.com/garyburd/redigo/redis"
 	"github.com/gorilla/mux"
 	"github.com/op/go-logging"
@@ -120,7 +121,7 @@ func main() {
 	// Serve image files
 	r.PathPrefix("/.images/").Handler(http.StripPrefix("/.images", http.HandlerFunc(ImageHandler)))
 	// Serve thumbnail files
-	r.PathPrefix("/.thumbs/").Handler(http.StripPrefix("/.thumbs", http.HandlerFunc(ThumbHandler)))
+	r.PathPrefix("/.thumbs/").Handler(http.StripPrefix("/.thumbs", expiresHandler(30, http.HandlerFunc(ThumbHandler))))
 	// Serve special stupid files
 	r.HandleFunc("/favicon.ico", serveStatic)
 	r.HandleFunc("/robots.txt", serveStatic)
@@ -159,6 +160,21 @@ func noDirFileServer(h http.Handler) http.HandlerFunc {
 
 func serveStatic(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, path.Join("static", r.URL.Path))
+}
+
+// Dumb expires handler
+func expiresHandler(days int, h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Cache-Control
+		secs := days * 24 * 60 * 60
+		w.Header().Add("Cache-Control", fmt.Sprintf("max-age=%d", secs))
+
+		// Expires
+		expires := time.Now().AddDate(0, 0, 30).UTC().Format(time.RFC1123)
+		w.Header().Add("Expires", expires)
+
+		h.ServeHTTP(w, r)
+	})
 }
 
 func getGallery(r *http.Request) string {
