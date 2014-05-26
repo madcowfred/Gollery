@@ -95,7 +95,7 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 // Render a template
 func renderTemplate(w http.ResponseWriter, t string, p *Page) {
 	err := tmpl[t].ExecuteTemplate(w, "base", p)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-    }
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
