@@ -3,12 +3,12 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="{{.BaseURL}}.static/gollery.min.css" rel="stylesheet" type="text/css">
+        <link href="{{.BaseURL}}.static/{{.StaticCSS}}" rel="stylesheet" type="text/css">
         {{template "head" .}}
     </head>
     <body>
         {{ template "body" .}}
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-        <script src="{{.BaseURL}}.static/gollery.min.js"></script>
+        <script src="{{.BaseURL}}.static/{{.StaticJS}}"></script>
     </body>
 </html>{{end}}

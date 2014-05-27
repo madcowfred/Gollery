@@ -26,12 +26,15 @@ func init() {
 }
 
 type Page struct {
-	BaseURL string
-	JSON    string
-	Name    string
-	Path    string
-	Dirs    []string
-	Images  []ImageInfo
+	BaseURL      string
+	JSON         string
+	Name         string
+	Path         string
+	StaticFolder string
+	StaticCSS    string
+	StaticJS     string
+	Dirs         []string
+	Images       []ImageInfo
 }
 
 func galleryStaticHandler(w http.ResponseWriter, r *http.Request, basePath string) {
@@ -110,11 +113,14 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Render the page
 	p := &Page{
-		BaseURL: gallery.BaseURL,
-		Name:    gallery.Name,
-		Path:    r.URL.Path,
-		Dirs:    dirs,
-		Images:  images,
+		BaseURL:      gallery.BaseURL,
+		Name:         gallery.Name,
+		Path:         r.URL.Path,
+		StaticCSS:    staticFiles["gollery.min.css"],
+		StaticFolder: staticFiles["folder.png"],
+		StaticJS:     staticFiles["gollery.min.js"],
+		Dirs:         dirs,
+		Images:       images,
 	}
 	renderTemplate(w, "gallery", p)
 }
