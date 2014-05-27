@@ -332,11 +332,15 @@ var Grid = (function() {
 	}
 
 	function hidePreview() {
-		window.location.replace(window.location.href.split('#')[0] + '#');
+		var scr = document.body.scrollTop;
+
 		current = -1;
 		var preview = $.data( this, 'preview' );
 		preview.close();
 		$.removeData( this, 'preview' );
+
+		window.location.replace(window.location.href.split('#')[0] + '#');
+		document.body.scrollTop = scr;
 	}
 
 	// the preview obj / overlay
