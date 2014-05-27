@@ -1,8 +1,13 @@
 JS = assets/js/modernizr.custom.js assets/js/grid.js assets/js/gollery.js
 
-all: css js
+all: Gollery css js
 css: static/gollery.min.css
 js: static/gollery.min.js
+
+Gollery: *.go
+	@echo -n Building Gollery binary...
+	@go build
+	@echo \ done!
 
 static/gollery.min.css: assets/less/ assets/less/bootstrap/ assets/less/gollery/
 	@echo -n Compiling and minifying CSS...
