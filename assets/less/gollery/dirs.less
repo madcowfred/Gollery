@@ -6,9 +6,38 @@
         margin: 0 8px 8px 0;
         width: 96px;
         text-align: center;
+        position: relative;
 
         a:hover {
             text-decoration: none;
+        }
+        .text {
+            position: absolute;
+            top: 0px;
+            width: 96px;
+            height: 75px;
+            pointer-events: none;
+            text-align: center;
+            display: table-row;
+
+            div {
+                display: table-cell;
+                vertical-align: middle;
+                width: 96px;
+                height: 75px;
+                padding: 12px 6px 0 6px;
+                //font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+                //font-family: Futura, "Trebuchet MS", Arial, sans-serif;
+                font-family: "Trebuchet MS", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Tahoma, sans-serif;
+                font-size: 13px;
+                line-height: 14px;
+                color: #f8f8f8;
+                text-shadow:
+                    -1px -1px 0 #000,
+                     1px -1px 0 #000,
+                    -1px  1px 0 #000,
+                     1px  1px 0 #000;
+            }
         }
     }
 }

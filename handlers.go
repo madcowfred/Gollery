@@ -25,6 +25,11 @@ func init() {
 		ParseFiles("assets/templates/gallery.html", "assets/templates/base.html"))
 }
 
+type DirInfo struct {
+	Path string
+	Name string
+}
+
 type Page struct {
 	BaseURL      string
 	JSON         string
@@ -33,7 +38,7 @@ type Page struct {
 	StaticFolder string
 	StaticCSS    string
 	StaticJS     string
-	Dirs         []string
+	Dirs         []DirInfo
 	Images       []ImageInfo
 }
 
@@ -111,6 +116,12 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Zzrp
+	var dirinfos []DirInfo
+	for _, dirPath := range dirs {
+		dirinfos = append(dirinfos, DirInfo{dirPath, strings.Replace(dirPath, "_", " ", -1)})
+	}
+
 	// Render the page
 	p := &Page{
 		BaseURL:      gallery.BaseURL,
@@ -119,7 +130,7 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 		StaticCSS:    staticFiles["gollery.min.css"],
 		StaticFolder: staticFiles["folder.png"],
 		StaticJS:     staticFiles["gollery.min.js"],
-		Dirs:         dirs,
+		Dirs:         dirinfos,
 		Images:       images,
 	}
 	renderTemplate(w, "gallery", p)
