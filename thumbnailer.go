@@ -110,6 +110,7 @@ func (t *Thumbnailer) ScanFolder(gallery *GalleryConfig, basePath string) ([]str
 	extentStr := fmt.Sprintf("%dx%d", gallery.ThumbWidth, gallery.ThumbHeight)
 
 	// Iterateee
+	var latest ImageInfo
 	updateCache := true
 	// t3 := time.Now()
 	for _, fileInfo := range fileNames {
@@ -206,6 +207,11 @@ func (t *Thumbnailer) ScanFolder(gallery *GalleryConfig, basePath string) ([]str
 		images = append(images, imageInfo)
 		fileMap[fileName] = imageInfo
 
+		// Update the 'latest' thumb
+		if latest.ModTime < imageInfo.ModTime {
+			latest = imageInfo
+		}
+
 		log.Debug("loop for %s took %s", filePath, time.Since(tl))
 	}
 	// log.Debug("Loop took %s", time.Since(t3))
@@ -223,6 +229,11 @@ func (t *Thumbnailer) ScanFolder(gallery *GalleryConfig, basePath string) ([]str
 		return nil, nil, err
 	}
 	conn.Do("HSET", "images", basePath, string(b))
+
+	// If there was a latest image, update the dir thumb
+	if latest.ModTime > 0 {
+		conn.Do("HSET", "dirthumb", basePath, latest.ThumbPath)
+	}
 
 	return dirs, images, nil
 }

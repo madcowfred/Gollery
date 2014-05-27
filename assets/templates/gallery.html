@@ -4,7 +4,7 @@
 {{define "body"}}
 {{if .Dirs}}
 <div class="dirs border-top-next">
-{{range $dir := .Dirs}}<div class="dir"><a href="{{$dir.Path}}/"><img src="{{$.BaseURL}}.static/{{$.StaticFolder}}" width="96" height="75"><div>{{$dir.Name}}</div></a></div>{{end}}
+{{range $dir := .Dirs}}<div class="dir"><a href="{{$dir.Path}}/"><div><img src="{{$.BaseURL}}{{$dir.ThumbPath}}" width="96" height="96"></div><div>{{$dir.Name}}</div></a></div>{{end}}
 <div class="clearfix"></div></div>
 {{end}}
 {{if .Images}}

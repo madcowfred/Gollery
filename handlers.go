@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/garyburd/redigo/redis"
 	"html/template"
 	"net/http"
 	"os"
@@ -26,8 +27,9 @@ func init() {
 }
 
 type DirInfo struct {
-	Path string
-	Name string
+	Path      string
+	Name      string
+	ThumbPath string
 }
 
 type Page struct {
@@ -116,10 +118,32 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get a Redis connection
+	conn := redisPool.Get()
+	defer conn.Close()
+
 	// Zzrp
 	var dirinfos []DirInfo
 	for _, dirPath := range dirs {
-		dirinfos = append(dirinfos, DirInfo{dirPath, strings.Replace(dirPath, "_", " ", -1)})
+		// Fetch the thumbnail for this directory from Redis
+		thumbPath, err := redis.String(conn.Do("HGET", "dirthumb", path.Join(cleanPath, dirPath)))
+		if err != redis.ErrNil && err != nil {
+			log.Error("GalleryHandler:", err.Error())
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+		}
+
+		// Placeholder thumbPath?
+		if thumbPath == "" {
+			thumbPath = ".static/" + staticFiles["folder.png"]
+		} else {
+			thumbPath = ".thumbs/" + thumbPath
+		}
+
+		dirinfos = append(dirinfos, DirInfo{
+			dirPath,
+			strings.Replace(dirPath, "_", " ", -1),
+			thumbPath,
+		})
 	}
 
 	// Render the page
