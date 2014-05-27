@@ -154,7 +154,8 @@ func (t *Thumbnailer) ScanFolder(gallery *GalleryConfig, basePath string) ([]str
 		cmd := exec.Command("convert", fmt.Sprintf("%s[0]", filePath), "-thumbnail", resizeStr, "-gravity", "center", "-quality", "90", "-extent", extentStr, "-verbose", thumbPath)
 		out, err := cmd.CombinedOutput()
 		if err != nil {
-			return nil, nil, err
+			log.Warning("convert failed: %q", out)
+			continue
 		}
 
 		// Get image dimensions from the output
