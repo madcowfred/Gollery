@@ -332,7 +332,8 @@ var Grid = (function() {
 	}
 
 	function hidePreview() {
-		var scr = document.body.scrollTop;
+		//console.log(this.scrollTop());
+		var scr = $window.scrollTop();
 
 		current = -1;
 		var preview = $.data( this, 'preview' );
@@ -340,7 +341,8 @@ var Grid = (function() {
 		$.removeData( this, 'preview' );
 
 		window.location.replace(window.location.href.split('#')[0] + '#');
-		document.body.scrollTop = scr;
+		//setTimeout(function() { window.scrollTop = scr; }, 200);
+		$window.scrollTop(scr);
 	}
 
 	// the preview obj / overlay
