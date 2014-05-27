@@ -211,6 +211,11 @@ var Grid = (function() {
 			// initialize some events
 			initEvents();
 
+			// maybe click a hash
+			var hash = document.location.hash.substring(1);
+			if (hash) {
+				$('a[data-title="' + hash + '"]').click();
+			}
 		} );
 
 	}
@@ -289,7 +294,6 @@ var Grid = (function() {
 	}
 
 	function showPreview( $item ) {
-
 		var preview = $.data( this, 'preview' ),
 			// item´s offset top
 			position = $item.data( 'offsetTop' );
@@ -315,6 +319,9 @@ var Grid = (function() {
 
 		}
 
+		// set page hash to title
+		window.location.replace(window.location.href.split('#')[0] + '#' + $item.children('a').data('title'));
+
 		// update previewPos
 		previewPos = position;
 		// initialize new preview for the clicked item
@@ -325,6 +332,7 @@ var Grid = (function() {
 	}
 
 	function hidePreview() {
+		window.location.replace(window.location.href.split('#')[0] + '#');
 		current = -1;
 		var preview = $.data( this, 'preview' );
 		preview.close();
