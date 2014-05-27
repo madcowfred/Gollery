@@ -54,6 +54,10 @@ func (gc *GalleryCache) Set(basePath string, dirs []string, images []ImageInfo) 
 	}
 }
 
+func (gc *GalleryCache) Delete(basePath string) {
+	delete(gc.Paths, basePath)
+}
+
 func (gc *GalleryCache) Expire() {
 	// Acquire lock
 	gc.Lock()

@@ -16,6 +16,10 @@ import (
 	"time"
 )
 
+const (
+	THUMBNAIL_TIMEOUT = time.Duration(15) * time.Second
+)
+
 var (
 	reDimensions = regexp.MustCompile(" ([0-9]+)x([0-9]+)")
 	reImage      = regexp.MustCompile("(?i)^(.+)\\.(gif|jpeg|jpg|png)$")
@@ -60,7 +64,7 @@ func (t *Thumbnailer) GetMutex(basePath string) *sync.Mutex {
 }
 
 func (t *Thumbnailer) ScanFolder(gallery *GalleryConfig, basePath string) ([]string, []ImageInfo, error) {
-	// start := time.Now()
+	start := time.Now()
 	// defer func() {
 	// 	log.Info("ScanFolder(%s) took %s", basePath, time.Since(start))
 	// }()
@@ -106,8 +110,16 @@ func (t *Thumbnailer) ScanFolder(gallery *GalleryConfig, basePath string) ([]str
 	extentStr := fmt.Sprintf("%dx%d", gallery.ThumbWidth, gallery.ThumbHeight)
 
 	// Iterateee
+	updateCache := true
 	// t3 := time.Now()
 	for _, fileInfo := range fileNames {
+		// Exit the loop if time expires
+		if time.Since(start) > THUMBNAIL_TIMEOUT {
+			log.Debug("ScanFolder timeout")
+			updateCache = false
+			break
+		}
+
 		tl := time.Now()
 
 		fileName := fileInfo.Name()
@@ -199,7 +211,11 @@ func (t *Thumbnailer) ScanFolder(gallery *GalleryConfig, basePath string) ([]str
 	// log.Debug("Loop took %s", time.Since(t3))
 
 	// Update cache
-	cache.Set(basePath, dirs, images)
+	if updateCache {
+		cache.Set(basePath, dirs, images)
+	} else {
+		cache.Delete(basePath)
+	}
 
 	// Update Redis
 	b, err := json.Marshal(fileMap)
