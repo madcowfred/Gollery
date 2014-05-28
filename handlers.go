@@ -133,7 +133,7 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Placeholder thumbPath?
-		if thumbPath == "" {
+		if dirPath == ".." || thumbPath == "" {
 			thumbPath = ".static/" + staticFiles["folder.png"]
 		} else {
 			thumbPath = ".thumbs/" + thumbPath
