@@ -220,25 +220,6 @@ var Grid = (function() {
 
 	}
 
-	// add more items to the grid.
-	// the new items need to appended to the grid.
-	// after that call Grid.addItems(theItems);
-	function addItems( $newitems ) {
-
-		$items = $items.add( $newitems );
-
-		$newitems.each( function() {
-			var $item = $( this );
-			$item.data( {
-				offsetTop : $item.offset().top,
-				height : $item.height()
-			} );
-		} );
-
-		initItemsEvents( $newitems );
-
-	}
-
 	// saves the item´s offset top and height (if saveheight is true)
 	function saveItemInfo( saveheight ) {
 		$items.each( function() {
@@ -357,7 +338,7 @@ var Grid = (function() {
 		create : function() {
 			// create Preview structure:
 			this.$title = $( '<h3></h3>' );
-			this.$description = $( '<p></p>' );
+			this.$description = $( '<div class="og-desc"></div>' );
 			this.$href = $( '<a href="#" target="_blank">Original image</a>' );
 			this.$details = $( '<div class="og-details"></div>' ).append( this.$title, this.$description, this.$href );
 			this.$loading = $( '<div class="og-loading"></div>' );
@@ -396,12 +377,20 @@ var Grid = (function() {
 					href : $itemEl.attr( 'href' ),
 					largesrc : $itemEl.data( 'largesrc' ),
 					title : $itemEl.data( 'title' ),
-					description : $itemEl.data( 'description' )
+					//description : $itemEl.data( 'description' )
+					dimensions: $itemEl.data('dimensions'),
+					size: $itemEl.data('size'),
+					modified: $itemEl.data('modified'),
 				};
 
 			this.$title.html( eldata.title );
-			this.$description.html( eldata.description );
 			this.$href.attr( 'href', eldata.href );
+
+			// Update description
+			var html = '<p>Dimensions</p><p>' + eldata.dimensions + '</p>';
+			html += '<p>File size</p><p>' + eldata.size + '</p>';
+			html += '<p>Modified</p><p>' + eldata.modified + '</p>';
+			this.$description.html(html);
 
 			var self = this;
 
@@ -525,7 +514,6 @@ var Grid = (function() {
 
 	return {
 		init : init,
-		addItems : addItems
 	};
 
 })();
