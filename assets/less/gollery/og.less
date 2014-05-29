@@ -117,9 +117,10 @@
 
     h3 {
         font-weight: 300;
-        font-size: 36px;
+        font-size: 32px;
         padding: 0 0 0 5px;
         margin: 0;
+        line-height: 34px;
     }
 
 /*    p {
@@ -134,7 +135,6 @@
         font-weight: 700;
         font-size: 16px;
         color: darken(@link-color, 30%);
-        //text-transform: uppercase;
         letter-spacing: 2px;
         padding: 10px;
         border: 2px solid darken(darken(@link-color, 30%), 30%);
@@ -166,11 +166,32 @@
             margin-top: 10px;
         }
         p:nth-child(odd) {
-            font-weight: bold;
             margin-bottom: 0;
+            font-weight: bold;
+            color: #999;
+            border-bottom: 1px solid #333;
         }
         p:nth-child(even) {
             margin-top: 0;
+        }
+    }
+    .og-prevnext {
+        .og-prev,
+        .og-next {
+            position: absolute;
+            bottom: 0px;
+            font-size: 50px;
+            cursor: pointer;
+
+            &:hover {
+                color: #fff;
+            }
+        }
+        .og-prev {
+            left: 0px;
+        }
+        .og-next {
+            right: 25px;
         }
     }
 }

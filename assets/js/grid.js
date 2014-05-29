@@ -175,7 +175,7 @@ var Grid = (function() {
 		// extra amount of pixels to scroll the window
 		scrollExtra = -10,
 		// extra margin when expanded (between preview overlay and the next items)
-		marginExpanded = 10,
+		marginExpanded = 0,
 		$window = $( window ), winsize,
 		$body = $( 'html, body' ),
 		// transitionend events
@@ -281,6 +281,9 @@ var Grid = (function() {
 
 		scrollExtra = 0;
 
+		// set page hash to title
+		window.location.replace(window.location.href.split('#')[0] + '#' + $item.children('a').data('title'));
+
 		// if a preview exists and previewPos is different (different row) from item´s top then close it
 		if( typeof preview != 'undefined' ) {
 
@@ -297,11 +300,7 @@ var Grid = (function() {
 				preview.update( $item );
 				return false;
 			}
-
 		}
-
-		// set page hash to title
-		window.location.replace(window.location.href.split('#')[0] + '#' + $item.children('a').data('title'));
 
 		// update previewPos
 		previewPos = position;
@@ -313,7 +312,6 @@ var Grid = (function() {
 	}
 
 	function hidePreview() {
-		//console.log(this.scrollTop());
 		var scr = $window.scrollTop();
 
 		current = -1;
@@ -340,7 +338,8 @@ var Grid = (function() {
 			this.$title = $( '<h3></h3>' );
 			this.$description = $( '<div class="og-desc"></div>' );
 			this.$href = $( '<a href="#" target="_blank">Original image</a>' );
-			this.$details = $( '<div class="og-details"></div>' ).append( this.$title, this.$description, this.$href );
+			this.$prevnext = $('<div class="og-prevnext"></div>');
+			this.$details = $( '<div class="og-details"></div>' ).append( this.$title, this.$description, this.$href, this.$prevnext );
 			this.$loading = $( '<div class="og-loading"></div>' );
 			this.$fullimage = $( '<div class="og-fullimg"></div>' ).append( this.$loading );
 			this.$closePreview = $( '<span class="og-close"></span>' );
@@ -383,6 +382,8 @@ var Grid = (function() {
 					modified: $itemEl.data('modified'),
 				};
 
+			//console.log(current, $items);
+
 			this.$title.html( eldata.title );
 			this.$href.attr( 'href', eldata.href );
 
@@ -391,6 +392,18 @@ var Grid = (function() {
 			html += '<p>File size</p><p>' + eldata.size + '</p>';
 			html += '<p>Modified</p><p>' + eldata.modified + '</p>';
 			this.$description.html(html);
+
+			// Update prev/next
+			html = '';
+			if (current > 0) {
+				var click = "$('.og-grid li:nth-child(" + current + ") a').click()";
+				html += '<span class="og-prev" onclick="' + click + '">&#8678;</span>';
+			}
+			if (current < ($items.length - 1)) {
+				var click = "$('.og-grid li:nth-child(" + (current + 2) + ") a').click()";
+				html += '<span class="og-next" onclick="' + click + '">&#8680;</span>';
+			}
+			this.$prevnext.html(html);
 
 			var self = this;
 
