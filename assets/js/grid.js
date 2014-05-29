@@ -293,7 +293,7 @@ var Grid = (function() {
 				if( position > previewPos ) {
 					scrollExtra = preview.height;
 				}
-				hidePreview();
+				hidePreview(true);
 			}
 			// same row
 			else {
@@ -311,7 +311,7 @@ var Grid = (function() {
 
 	}
 
-	function hidePreview() {
+	function hidePreview(skipHash) {
 		var scr = $window.scrollTop();
 
 		current = -1;
@@ -319,7 +319,10 @@ var Grid = (function() {
 		preview.close();
 		$.removeData( this, 'preview' );
 
-		window.location.replace(window.location.href.split('#')[0] + '#');
+		if (skipHash !== true) {
+			window.location.replace(window.location.href.split('#')[0] + '#');
+		}
+
 		//setTimeout(function() { window.scrollTop = scr; }, 200);
 		$window.scrollTop(scr);
 	}
