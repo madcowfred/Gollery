@@ -92,18 +92,18 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	gallery := Config.Gallery[g]
 
-	// Check path
-	cleanPath := path.Clean(path.Join(gallery.ImagePath, r.URL.Path))
-	if !strings.HasPrefix(cleanPath, gallery.ImagePath) {
-		http.NotFound(w, r)
-		return
-	}
-
 	// Check for trailing /
 	if !strings.HasSuffix(r.URL.Path, "/") {
 		newPath := path.Clean(gallery.BaseURL+r.URL.Path) + "/"
 		log.Debug("%s -> %s", r.URL.Path, newPath)
 		localRedirect(w, r, newPath)
+		return
+	}
+
+	// Check path
+	cleanPath := path.Clean(path.Join(gallery.ImagePath, r.URL.Path))
+	if !strings.HasPrefix(cleanPath, gallery.ImagePath) {
+		http.NotFound(w, r)
 		return
 	}
 
