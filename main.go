@@ -25,6 +25,7 @@ var (
 	log         = logging.MustGetLogger("gollery")
 	staticFiles = make(map[string]string)
 	tn          = NewThumbnailer()
+	vmChan      = VideoMaker()
 )
 
 // Redis connection pool
@@ -53,6 +54,7 @@ type GalleryConfig struct {
 	ThumbPath   string
 	ThumbWidth  int
 	ThumbHeight int
+	VideoPath   string
 }
 
 var Config struct {
@@ -147,8 +149,9 @@ func main() {
 	}
 	//r.PathPrefix("/.static/").Handler(http.StripPrefix("/.static", noDirFileServer(http.FileServer(http.Dir("static/")))))
 
-	// Serve image files
+	// Serve image and video files
 	r.PathPrefix("/.images/").Handler(http.StripPrefix("/.images", http.HandlerFunc(ImageHandler)))
+	r.PathPrefix("/.videos/").Handler(http.StripPrefix("/.videos", http.HandlerFunc(VideoHandler)))
 	// Serve thumbnail files
 	r.PathPrefix("/.thumbs/").Handler(http.StripPrefix("/.thumbs", expiresHandler(30, http.HandlerFunc(ThumbHandler))))
 	// Serve galleries
@@ -169,6 +172,15 @@ func (g *GalleryConfig) InitThumbDirs() {
 		if err := os.Mkdir(dirPath, 0755); err != nil {
 			if !os.IsExist(err) {
 				log.Warning("Mkdir error: %s", err)
+			}
+		}
+
+		if (g.VideoPath != "") {
+			dirPath = path.Join(g.VideoPath, string(d))
+			if err := os.Mkdir(dirPath, 0755); err != nil {
+				if !os.IsExist(err) {
+					log.Warning("Mkdir error: %s", err)
+				}
 			}
 		}
 	}

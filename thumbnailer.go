@@ -25,6 +25,12 @@ var (
 	reImage      = regexp.MustCompile("(?i)^(.+)\\.(gif|jpeg|jpg|png)$")
 )
 
+type FolderData struct {
+	BasePath string
+	FileMap  *map[string]ImageInfo
+	Gallery  *GalleryConfig
+}
+
 // Image information, gasp
 type ImageInfo struct {
 	FileSize    int64  `json:"s"`
@@ -34,6 +40,7 @@ type ImageInfo struct {
 	ImageWidth  int    `json:"w"`
 	ImageHeight int    `json:"h"`
 	ThumbPath   string `json:"t"`
+	VideoPath   string `json:"v"`
 }
 
 type Thumbnailer struct {
@@ -234,6 +241,9 @@ func (t *Thumbnailer) ScanFolder(gallery *GalleryConfig, basePath string) ([]str
 	if latest.ModTime > 0 {
 		conn.Do("HSET", "dirthumb", basePath, latest.ThumbPath)
 	}
+
+	// Send the gallery data to the video maker
+	vmChan <- FolderData{ basePath, &fileMap, gallery }
 
 	return dirs, images, nil
 }

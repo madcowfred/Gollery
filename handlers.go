@@ -82,6 +82,24 @@ func ThumbHandler(w http.ResponseWriter, r *http.Request) {
 	galleryStaticHandler(w, r, gallery.ThumbPath)
 }
 
+// Serve static videos for galleries
+func VideoHandler(w http.ResponseWriter, r *http.Request) {
+	// Check the gallery header
+	g := getGallery(r)
+	if g == "" {
+		http.NotFound(w, r)
+		return
+	}
+	gallery := Config.Gallery[g]
+
+	if gallery.VideoPath == "" {
+		http.NotFound(w, r)
+		return
+	}
+
+	galleryStaticHandler(w, r, gallery.VideoPath)
+}
+
 // Serve a gallery page
 func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 	// Check the gallery header
@@ -122,7 +140,7 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 	conn := redisPool.Get()
 	defer conn.Close()
 
-	// Zzrp
+	// Do directory stuff
 	var dirinfos []DirInfo
 	for _, dirPath := range dirs {
 		// Fetch the thumbnail for this directory from Redis
@@ -130,6 +148,7 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 		if err != redis.ErrNil && err != nil {
 			log.Error("GalleryHandler:", err.Error())
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
 		}
 
 		// Placeholder thumbPath?
@@ -145,6 +164,34 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 			thumbPath,
 		})
 	}
+
+	// Build a map of GIF -> webm conversions in this folder
+	webmMap := make(map[string]string)
+
+	key := fmt.Sprintf("webm:%s", cleanPath)
+	results, err := redis.Strings(conn.Do("HGETALL", key))
+	if err != nil {
+		log.Error("HGETALL:", err.Error())
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	l := len(results) / 2
+	for i := 0; i < l; i++ {
+		webmMap[results[i]] = results[i+1]
+	}
+
+	// Update the VideoPath of any relevant images
+	for i := range images {
+		vp, ok := webmMap[images[i].ImagePath]
+		if ok {
+			images[i].VideoPath = vp
+			log.Debug("video %q", images[i])
+		}
+	}
+
+	log.Debug("%q", images)
+
 
 	// Render the page
 	p := &Page{
