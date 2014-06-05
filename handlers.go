@@ -166,31 +166,41 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Build a map of GIF -> webm conversions in this folder
-	webmMap := make(map[string]string)
+	if gallery.VideoPath != "" {
+		webmMap := make(map[string]string)
 
-	key := fmt.Sprintf("webm:%s", cleanPath)
-	results, err := redis.Strings(conn.Do("HGETALL", key))
-	if err != nil {
-		log.Error("HGETALL:", err.Error())
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
+		key := fmt.Sprintf("webm:%s", cleanPath)
+		results, err := redis.Strings(conn.Do("HGETALL", key))
+		if err != nil {
+			log.Error("HGETALL:", err.Error())
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
 
-	l := len(results) / 2
-	for i := 0; i < l; i++ {
-		webmMap[results[i]] = results[i+1]
-	}
+		l := len(results) / 2
+		for i := 0; i < l; i++ {
+			webmMap[results[i]] = results[i+1]
+		}
 
-	// Update the VideoPath of any relevant images
-	for i := range images {
-		vp, ok := webmMap[images[i].ImagePath]
-		if ok {
-			images[i].VideoPath = vp
-			log.Debug("video %q", images[i])
+		// Update the VideoPath of any relevant images
+		for i := range images {
+			vp, ok := webmMap[images[i].ImagePath]
+			if ok {
+				images[i].VideoPath = vp
+
+				// File size, ew
+				videoPath := path.Join(gallery.VideoPath, vp)
+				fi, err := os.Stat(videoPath)
+				if err != nil {
+					log.Error("video stat:", err.Error())
+					http.Error(w, "Internal server error", http.StatusInternalServerError)
+					return
+				}
+
+				images[i].VideoSize = fi.Size()
+			}
 		}
 	}
-
-	log.Debug("%q", images)
 
 	// Render the page
 	p := &Page{

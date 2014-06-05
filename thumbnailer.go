@@ -40,7 +40,8 @@ type ImageInfo struct {
 	ImageWidth  int    `json:"w"`
 	ImageHeight int    `json:"h"`
 	ThumbPath   string `json:"t"`
-	VideoPath   string `json:"v"`
+	VideoPath   string `json:"-"`
+	VideoSize   int64  `json:"-"`
 }
 
 type Thumbnailer struct {

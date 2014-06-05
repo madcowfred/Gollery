@@ -10,7 +10,7 @@
 {{if .Images}}
 <div class="images border-top-next"><ul id="og-grid" class="og-grid">
 {{range $image := .Images}}<li>
-<a href="{{$.BaseURL}}.images/{{$image.ImagePath}}" data-largesrc="{{$.BaseURL}}.images/{{$image.ImagePath}}" data-title="{{$image.ImageTitle}}" data-dimensions="{{$image.ImageWidth}} x {{$image.ImageHeight}}" data-size="{{$image.FileSize | formatSize}}" data-modified="{{$image.ModTime | formatTime}}"{{if $image.VideoPath}} data-video="{{$.BaseURL}}.videos/{{$image.VideoPath}}"{{end}}>
+<a href="{{$.BaseURL}}.images/{{$image.ImagePath}}" data-largesrc="{{$.BaseURL}}.images/{{$image.ImagePath}}" data-title="{{$image.ImageTitle}}" data-dimensions="{{$image.ImageWidth}} x {{$image.ImageHeight}}" data-size="{{$image.FileSize | formatSize}}" data-modified="{{$image.ModTime | formatTime}}"{{if $image.VideoPath}} data-video="{{$.BaseURL}}.videos/{{$image.VideoPath}}" data-videosize="{{$image.VideoSize | formatSize}}"{{end}}>
 <img src="{{$.BaseURL}}.thumbs/{{$image.ThumbPath}}" width="200" height="200">
 </a>
 </li>{{end}}

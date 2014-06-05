@@ -194,7 +194,9 @@ var Grid = (function() {
 			minHeight : 500,
 			speed : 100,
 			easing : 'ease'
-		};
+		},
+		// video support
+		useVideo = Modernizr.video.webm;
 
 	function init( config ) {
 
@@ -340,7 +342,7 @@ var Grid = (function() {
 			// create Preview structure:
 			this.$title = $( '<h3></h3>' );
 			this.$description = $( '<div class="og-desc"></div>' );
-			this.$href = $( '<a href="#" target="_blank">Original image</a>' );
+			this.$href = $( '<div class="og-links"></div>' );
 			this.$prevnext = $('<div class="og-prevnext"></div>');
 			this.$details = $( '<div class="og-details"></div>' ).append( this.$title, this.$description, this.$href, this.$prevnext );
 			this.$loading = $( '<div class="og-loading"></div>' );
@@ -383,16 +385,23 @@ var Grid = (function() {
 					dimensions: $itemEl.data('dimensions'),
 					size: $itemEl.data('size'),
 					modified: $itemEl.data('modified'),
+					video: $itemEl.data('video'),
+					videosize: $itemEl.data('videosize'),
 				};
 
 			//console.log(current, $items);
 
 			this.$title.html( eldata.title );
-			this.$href.attr( 'href', eldata.href );
+			this.$href.html('<a href="' + eldata.href + '" target="_blank">Original image</a>')
 
 			// Update description
 			var html = '<p>Dimensions</p><p>' + eldata.dimensions + '</p>';
-			html += '<p>File size</p><p>' + eldata.size + '</p>';
+			if (useVideo && eldata.video) {
+				html += '<p>File size</p><p>' + eldata.videosize + ' (' + eldata.size + ' orig)</p>';
+			}
+			else {
+				html += '<p>File size</p><p>' + eldata.size + '</p>';
+			}
 			html += '<p>Modified</p><p>' + eldata.modified + '</p>';
 			this.$description.html(html);
 
@@ -418,16 +427,27 @@ var Grid = (function() {
 			// preload large image and add it to the preview
 			// for smaller screens we don´t display the large image (the media query will hide the fullimage wrapper)
 			if( self.$fullimage.is( ':visible' ) ) {
-				this.$loading.show();
-				$( '<img/>' ).load( function() {
-					var $img = $( this );
-					if( $img.attr( 'src' ) === self.$item.children('a').data( 'largesrc' ) ) {
-						self.$loading.hide();
-						self.$fullimage.find( 'img' ).remove();
-						self.$largeImg = $img.fadeIn( 350 );
-						self.$fullimage.append( self.$largeImg );
-					}
-				} ).attr( 'src', eldata.largesrc );
+				if (useVideo && eldata.video) {
+					this.$loading.hide();
+					self.$fullimage.find('img, video').remove();
+
+					var html = '<video autoplay loop muted="muted"><source src="' + eldata.video + '" type="video/webm"></video>';
+					self.$fullimage.append(html);
+
+					self.$href.append('<a href="' + eldata.video + '" target="_blank">WebM video</a>');
+				}
+				else {
+					this.$loading.show();
+					$( '<img/>' ).load( function() {
+						var $img = $( this );
+						if( $img.attr( 'src' ) === self.$item.children('a').data( 'largesrc' ) ) {
+							self.$loading.hide();
+							self.$fullimage.find('img, video').remove();
+							self.$largeImg = $img.fadeIn( 350 );
+							self.$fullimage.append( self.$largeImg );
+						}
+					} ).attr( 'src', eldata.largesrc );
+				}
 			}
 
 		},

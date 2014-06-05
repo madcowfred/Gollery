@@ -85,7 +85,7 @@ func VideoMaker() chan FolderData {
 				}
 
 				// Now we can finally make a webm
-				cmd := exec.Command("ffmpeg", "-i", filePath, "-c:v", "libvpx", "-threads", "0", "-an", "-crf", "10", videoPath)
+				cmd := exec.Command("ffmpeg", "-i", filePath, "-c:v", "libvpx", "-threads", "0", "-an", "-crf", "4", "-b:v", "1000k", videoPath)
 				if err = cmd.Run(); err != nil {
 					log.Warning("VideoMaker(%s) unable to make webm %s: %s", fd.BasePath, fileName, err.Error())
 					continue
