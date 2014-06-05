@@ -175,7 +175,7 @@ func (g *GalleryConfig) InitThumbDirs() {
 			}
 		}
 
-		if (g.VideoPath != "") {
+		if g.VideoPath != "" {
 			dirPath = path.Join(g.VideoPath, string(d))
 			if err := os.Mkdir(dirPath, 0755); err != nil {
 				if !os.IsExist(err) {

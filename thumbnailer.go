@@ -243,7 +243,7 @@ func (t *Thumbnailer) ScanFolder(gallery *GalleryConfig, basePath string) ([]str
 	}
 
 	// Send the gallery data to the video maker
-	vmChan <- FolderData{ basePath, &fileMap, gallery }
+	vmChan <- FolderData{basePath, &fileMap, gallery}
 
 	return dirs, images, nil
 }

@@ -192,7 +192,6 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Debug("%q", images)
 
-
 	// Render the page
 	p := &Page{
 		BaseURL:      gallery.BaseURL,

@@ -17,7 +17,7 @@ import (
 
 var (
 	reGIF = regexp.MustCompile("(?i)^(.+)\\.(gif)$")
-	test = "\x00\x21\xF9\x04baaa\x00\x2Czzzzzzzz\x00\x21\xF9\x04boooo\x00\x2C"
+	test  = "\x00\x21\xF9\x04baaa\x00\x2Czzzzzzzz\x00\x21\xF9\x04boooo\x00\x2C"
 )
 
 func VideoMaker() chan FolderData {
